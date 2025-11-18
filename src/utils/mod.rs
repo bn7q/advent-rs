@@ -8,12 +8,12 @@ pub fn read_input(year: u16, day: u16, is_test: bool) -> Result<String, std::io:
     } else {
         format!("d{:02}.txt", day)
     };
-    
+
     let path: PathBuf = ["inputs", year.to_string().as_str(), &filename]
         .iter()
         .collect();
-    println!("trying to read {:?}",path);
-    
+    println!("trying to read {:?}", path);
+
     fs::read_to_string(path)
 }
 
@@ -32,7 +32,7 @@ pub fn format_duration(duration: Duration) -> String {
     let micros = duration.as_micros();
     let millis = duration.as_millis();
     let secs = duration.as_secs_f64();
-    
+
     if micros < 1_000 {
         format!("{} µs", micros)
     } else if millis < 1_000 {
@@ -40,4 +40,13 @@ pub fn format_duration(duration: Duration) -> String {
     } else {
         format!("{:.2} s", secs)
     }
+}
+
+#[macro_export]
+macro_rules! with_duration {
+    ($func:expr) => {{
+        let start = std::time::Instant::now();
+        let result = ($func);
+        (result, start.elapsed())
+    }};
 }
