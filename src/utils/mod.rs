@@ -12,7 +12,6 @@ pub fn read_input(year: u16, day: u16, is_test: bool) -> Result<String, std::io:
     let path: PathBuf = ["inputs", year.to_string().as_str(), &filename]
         .iter()
         .collect();
-    println!("trying to read {:?}", path);
 
     fs::read_to_string(path)
 }
