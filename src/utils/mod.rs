@@ -1,6 +1,9 @@
+use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use std::time::Duration;
+use std::str::FromStr;
+
+pub mod grid;
 
 pub fn read_input(year: u16, day: u16, is_test: bool) -> Result<String, std::io::Error> {
     let filename = if is_test {
@@ -27,25 +30,24 @@ pub fn read_numbers(input: &str) -> Vec<i32> {
         .collect()
 }
 
-pub fn format_duration(duration: Duration) -> String {
-    let micros = duration.as_micros();
-    let millis = duration.as_millis();
-    let secs = duration.as_secs_f64();
-
-    if micros < 1_000 {
-        format!("{} µs", micros)
-    } else if millis < 1_000 {
-        format!("{:.2} ms", secs * 1000.0)
-    } else {
-        format!("{:.2} s", secs)
-    }
+pub fn read_grid_parsed<T: FromStr>(input: &str, start_at: usize) -> Vec<Vec<T>> {
+    input
+        .lines()
+        .enumerate()
+        .filter(|&(i, _)| i >= start_at)
+        .map(|(_, v)| v)
+        .map(|line| 
+            line.trim().split(' ').filter_map(|d| d.parse().ok()).collect()
+        )
+        .collect()
 }
 
-#[macro_export]
-macro_rules! with_duration {
-    ($func:expr) => {{
-        let start = std::time::Instant::now();
-        let result = ($func);
-        (result, start.elapsed())
-    }};
+pub fn count_elements<T: Eq + std::hash::Hash>(collection: impl IntoIterator<Item = T>) -> HashMap<T, u64> {
+    let mut m = HashMap::new();
+    for e in collection.into_iter() {
+        let entry = m.entry(e).or_default();
+        *entry += 1;
+    }
+
+    return m;
 }

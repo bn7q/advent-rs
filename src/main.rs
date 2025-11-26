@@ -1,6 +1,5 @@
 use advent_rs::puzzles;
 use advent_rs::utils;
-use advent_rs::with_duration;
 use std::env;
 
 fn main() {
@@ -35,9 +34,18 @@ fn main() {
     
     let (result1, time1) = with_duration!(puzzle.solve1(input.as_str()));
     println!("Part 1: {}", result1);
-    println!("Took:   {}\n", utils::format_duration(time1));
+    println!("Took:   {:?}\n", time1);
 
     let (result2, time2) = with_duration!(puzzle.solve2(input.as_str()));
     println!("Part 2: {}", result2);
-    println!("Took:   {}\n", utils::format_duration(time2));
+    println!("Took:   {:?}\n", time2);
+}
+
+#[macro_export]
+macro_rules! with_duration {
+    ($func:expr) => {{
+        let start = std::time::Instant::now();
+        let result = ($func);
+        (result, start.elapsed())
+    }};
 }
