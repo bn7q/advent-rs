@@ -1,15 +1,18 @@
+use regex::Regex;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use regex::Regex;
 
 fn main() {
     let puzzles_file = File::create("src/puzzles.rs").unwrap();
 
     let (years, days_in_years) = find_puzzles().unwrap();
 
-    let _ = writeln!(&puzzles_file, "/// This file is auto generated. Do not modify!");
+    let _ = writeln!(
+        &puzzles_file,
+        "/// This file is auto generated. Do not modify!"
+    );
     let _ = writeln!(&puzzles_file, "use crate::puzzle::Puzzle;");
 
     for (year, days) in years.iter().zip(&days_in_years) {
@@ -22,20 +25,26 @@ fn main() {
         let _ = writeln!(&puzzles_file, "}}");
     }
 
-    let _ = writeln!(&puzzles_file,"");
+    let _ = writeln!(&puzzles_file, "");
 
-    let _ = writeln!(&puzzles_file,"pub fn get_puzzle(y: u16, d: u16) -> Option<Box<dyn Puzzle>> {{");
-    let _ = writeln!(&puzzles_file,"    match (y, d) {{");
+    let _ = writeln!(
+        &puzzles_file,
+        "pub fn get_puzzle(y: u16, d: u16) -> Option<Box<dyn Puzzle>> {{"
+    );
+    let _ = writeln!(&puzzles_file, "    match (y, d) {{");
 
     for (year, days) in years.iter().zip(&days_in_years) {
         for day in days {
-            let _ = writeln!(&puzzles_file,"        ({year}, {day}) => Some(Box::new(y{year}::d{day:02}::P)),");
+            let _ = writeln!(
+                &puzzles_file,
+                "        ({year}, {day}) => Some(Box::new(y{year}::d{day:02}::P)),"
+            );
         }
     }
-    
-    let _ = writeln!(&puzzles_file,"        _ => None,");
-    let _ = writeln!(&puzzles_file,"    }}");
-    let _ = writeln!(&puzzles_file,"}}");
+
+    let _ = writeln!(&puzzles_file, "        _ => None,");
+    let _ = writeln!(&puzzles_file, "    }}");
+    let _ = writeln!(&puzzles_file, "}}");
 
     println!("cargo::rerun-if-changed=build.rs");
     println!("cargo::rerun-if-changed=src/puzzles.rs");
@@ -63,11 +72,11 @@ fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {
                     continue;
                 };
                 days_in_year.push(day_capture[1].parse::<u16>().ok()?);
-            };
+            }
             years.push(year);
             days.push(days_in_year);
         }
-    };
+    }
 
     return Some((years, days));
 }

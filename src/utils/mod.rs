@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::fs;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -30,19 +31,30 @@ pub fn read_numbers(input: &str) -> Vec<i32> {
         .collect()
 }
 
-pub fn read_grid_parsed<T: FromStr>(input: &str, start_at: usize) -> Vec<Vec<T>> {
+pub fn read_grid_parsed<T>(input: &str, start_at: usize) -> Result<Vec<Vec<T>>, T::Err>
+where
+    T: FromStr,
+    T::Err: Display,
+{
     input
         .lines()
         .enumerate()
         .filter(|&(i, _)| i >= start_at)
-        .map(|(_, v)| v)
-        .map(|line| 
-            line.trim().split(' ').filter_map(|d| d.parse().ok()).collect()
-        )
+        .map(|(i, line)| {
+            line.split_whitespace()
+                .map(|d| {
+                    d.parse()
+                        .inspect_err(|e| eprintln!("Failed to parse <{d}> on line {i}: {e}"))
+                })
+                .collect()
+        })
         .collect()
 }
 
-pub fn count_elements<T: Eq + std::hash::Hash>(collection: impl IntoIterator<Item = T>) -> HashMap<T, u64> {
+pub fn count_elements<T>(collection: impl IntoIterator<Item = T>) -> HashMap<T, u64>
+where
+    T: Eq + std::hash::Hash,
+{
     let mut m = HashMap::new();
     for e in collection.into_iter() {
         let entry = m.entry(e).or_default();
