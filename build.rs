@@ -47,8 +47,6 @@ fn main() {
     let _ = writeln!(&puzzles_file, "}}");
 
     println!("cargo::rerun-if-changed=build.rs");
-    println!("cargo::rerun-if-changed=src/puzzles.rs");
-    println!("cargo::rerun-if-changed=src/puzzles");
 }
 
 fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {
@@ -58,8 +56,11 @@ fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {
     let mut years = Vec::new();
     let mut days = Vec::new();
 
-    for dir in fs::read_dir(Path::new("src/puzzles")).ok()? {
-        let year_path = dir.ok()?.path();
+    let mut dirs: Vec<fs::DirEntry> = fs::read_dir(Path::new("src/puzzles")).ok()?.flat_map(|f| f.ok()).collect();
+    dirs.sort_by_key(|d| d.file_name());
+
+    for dir in dirs {
+        let year_path = dir.path();
         let Some(year_captures) = year_re.captures(year_path.file_name()?.to_str()?) else {
             continue;
         };
@@ -73,6 +74,7 @@ fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {
                 };
                 days_in_year.push(day_capture[1].parse::<u16>().ok()?);
             }
+            days_in_year.sort();
             years.push(year);
             days.push(days_in_year);
         }
