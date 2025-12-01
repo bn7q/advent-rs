@@ -34,7 +34,6 @@ impl Puzzle for P {
             p = (i + p).rem_euclid(100);
             // add 1 when going back and stop at 0 (didn't cross the border but hit 0)
             if i < 0 && p == 0 { res +=1 }
-            println!("{i}, {p} -> {res}");
         }
 
         return Ok(res.to_string());
