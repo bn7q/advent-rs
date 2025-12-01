@@ -47,6 +47,7 @@ fn main() {
     let _ = writeln!(&puzzles_file, "}}");
 
     println!("cargo::rerun-if-changed=build.rs");
+    println!("cargo::rerun-if-changed=src/puzzles");
 }
 
 fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {

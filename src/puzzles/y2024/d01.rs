@@ -31,8 +31,7 @@ impl Puzzle for P {
         let result: u64 = map1
             .iter()
             .map(|(key, count1)| {
-                let x = map2.get(key).unwrap_or(&0) * key * count1;
-                x
+                map2.get(key).unwrap_or(&0) * key * count1
             })
             .sum();
 

@@ -1,25 +1,24 @@
-#![allow(dead_code)]
 use std::ops;
 
 type Csize = i64;
-struct Vector {
+pub struct Vector {
     x: Csize,
     y: Csize,
 }
-type Point = Vector;
+pub type Point = Vector;
 
-const UP: Vector = Vector { x: -1, y: 0 };
-const DOWN: Vector = Vector { x: 1, y: 0 };
-const LEFT: Vector = Vector { x: 0, y: -1 };
-const RIGHT: Vector = Vector { x: 0, y: 1 };
+pub const UP: Vector = Vector { x: -1, y: 0 };
+pub const DOWN: Vector = Vector { x: 1, y: 0 };
+pub const LEFT: Vector = Vector { x: 0, y: -1 };
+pub const RIGHT: Vector = Vector { x: 0, y: 1 };
 
 impl Vector {
-    fn new(x: Csize, y: Csize) -> Self {
+    pub fn new(x: Csize, y: Csize) -> Self {
         Self { x: x, y: y }
     }
 
     // clockwise
-    fn rotate(self) -> Self {
+    pub fn rotate(self) -> Self {
         Self {
             x: self.y,
             y: -self.x,
@@ -27,14 +26,14 @@ impl Vector {
     }
 
     // counter-clockwise
-    fn rotate_back(self) -> Self {
+    pub fn rotate_back(self) -> Self {
         Self {
             x: -self.y,
             y: self.x,
         }
     }
 
-    fn neigbours(self) -> [Self; 4] {
+    pub fn neigbours(self) -> [Self; 4] {
         [
             Self::new(self.x - 1, self.y),
             Self::new(self.x + 1, self.y),
@@ -44,7 +43,7 @@ impl Vector {
     }
 
     // with diagonals
-    fn neigbours_all(self) -> [Self; 8] {
+    pub fn neigbours_all(self) -> [Self; 8] {
         [
             Self::new(self.x - 1, self.y),
             Self::new(self.x + 1, self.y),
