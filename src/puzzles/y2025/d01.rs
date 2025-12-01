@@ -22,12 +22,19 @@ impl Puzzle for P {
 
     fn solve2(&self, input: &str) -> PuzzleResult {
         let arr = parse_input(input)?;
-        let mut p: i64 = 50;
+        let mut p = 50;
         let mut res = 0;
 
         for i in arr {
+            // add number of 0-99 border crosses
             res += (i + p).div_euclid(100).abs();
+            // remove 1 when starting at 0 and going back (didn't hit another 0)
+            if i < 0 && p == 0 { res -= 1 }
+
             p = (i + p).rem_euclid(100);
+            // add 1 when going back and stop at 0 (didn't cross the border but hit 0)
+            if i < 0 && p == 0 { res +=1 }
+            println!("{i}, {p} -> {res}");
         }
 
         return Ok(res.to_string());
