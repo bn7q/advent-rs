@@ -57,7 +57,10 @@ fn find_puzzles() -> Option<(Vec<u16>, Vec<Vec<u16>>)> {
     let mut years = Vec::new();
     let mut days = Vec::new();
 
-    let mut dirs: Vec<fs::DirEntry> = fs::read_dir(Path::new("src/puzzles")).ok()?.flat_map(|f| f.ok()).collect();
+    let mut dirs: Vec<fs::DirEntry> = fs::read_dir(Path::new("src/puzzles"))
+        .ok()?
+        .flat_map(|f| f.ok())
+        .collect();
     dirs.sort_by_key(|d| d.file_name());
 
     for dir in dirs {
