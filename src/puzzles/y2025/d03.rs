@@ -37,7 +37,7 @@ impl Puzzle for P {
                     if chars[11] == char::MIN {
                         chars.rotate_right(1);
                         chars[0] = c;
-                    } else if c >= chars[0] {
+                    } else {
                         let mut temp = c;
                         for i in 0..12 {
                             if temp >= chars[i] {

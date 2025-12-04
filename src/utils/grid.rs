@@ -1,6 +1,8 @@
 use std::ops;
 
 type Csize = i64;
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub struct Vector {
     x: Csize,
     y: Csize,
@@ -12,13 +14,25 @@ pub const DOWN: Vector = Vector { x: 1, y: 0 };
 pub const LEFT: Vector = Vector { x: 0, y: -1 };
 pub const RIGHT: Vector = Vector { x: 0, y: 1 };
 
+pub const NEIGBOURS: [Vector; 4] = [UP, DOWN, LEFT, RIGHT];
+pub const NEIGBOURS_ALL: [Vector; 8] = [
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    Vector { x: -1, y: -1 },
+    Vector { x: -1, y: 1 },
+    Vector { x: 1, y: -1 },
+    Vector { x: 1, y: 1 },
+];
+
 impl Vector {
     pub fn new(x: Csize, y: Csize) -> Self {
         Self { x: x, y: y }
     }
 
     // clockwise
-    pub fn rotate(self) -> Self {
+    pub fn rotate(&self) -> Self {
         Self {
             x: self.y,
             y: -self.x,
@@ -26,34 +40,20 @@ impl Vector {
     }
 
     // counter-clockwise
-    pub fn rotate_back(self) -> Self {
+    pub fn rotate_back(&self) -> Self {
         Self {
             x: -self.y,
             y: self.x,
         }
     }
 
-    pub fn neigbours(self) -> [Self; 4] {
-        [
-            Self::new(self.x - 1, self.y),
-            Self::new(self.x + 1, self.y),
-            Self::new(self.x, self.y - 1),
-            Self::new(self.x, self.y + 1),
-        ]
+    pub fn neigbours(&self) -> impl Iterator<Item = Self> {
+        NEIGBOURS.iter().map(|d| *self + *d)
     }
 
     // with diagonals
-    pub fn neigbours_all(self) -> [Self; 8] {
-        [
-            Self::new(self.x - 1, self.y),
-            Self::new(self.x + 1, self.y),
-            Self::new(self.x, self.y - 1),
-            Self::new(self.x, self.y + 1),
-            Self::new(self.x - 1, self.y - 1),
-            Self::new(self.x - 1, self.y + 1),
-            Self::new(self.x + 1, self.y - 1),
-            Self::new(self.x + 1, self.y + 1),
-        ]
+    pub fn neigbours_all(&self) -> impl Iterator<Item = Self> {
+        NEIGBOURS_ALL.iter().map(|d| *self + *d)
     }
 }
 
@@ -89,3 +89,88 @@ impl ops::Neg for Vector {
         }
     }
 }
+
+pub struct Grid<T> {
+    x_len: usize,
+    y_len: usize,
+    grid: Vec<Vec<T>>,
+}
+
+pub struct GridElement<T> {
+    pub point: Point,
+    pub value: T,
+}
+
+impl<T: Copy> Grid<T> {
+    pub fn new(data: Vec<Vec<T>>) -> Grid<T> {
+        Grid {
+            x_len: data.len(),
+            y_len: data[0].len(),
+            grid: data,
+        }
+    }
+
+    pub fn fits_dimensions(&self, point: &Point) -> bool {
+        point.x >= 0 && point.x < self.x_len as i64 && point.y >= 0 && point.y < self.y_len as i64
+    }
+
+    pub fn get_neigbours_of(&self, point: &Point) -> impl Iterator<Item = T> {
+        point.neigbours().flat_map(|p| self.get(&p))
+    }
+
+    pub fn get_all_neigbours_of(&self, point: &Point) -> impl Iterator<Item = T> {
+        point.neigbours_all().flat_map(|p| self.get(&p))
+    }
+
+    pub fn get(&self, point: &Point) -> Option<T> {
+        if self.fits_dimensions(&point) {
+            Some(self.grid[point.x as usize][point.y as usize])
+        } else {
+            None
+        }
+    }
+
+    pub fn set(&mut self, point: &Point, value: T) -> Result<(), Error> {
+        if self.fits_dimensions(&point) {
+            self.grid[point.x as usize][point.y as usize] = value;
+            Ok(())
+        } else {
+            Err(Error::IndicesOutOfBounds(*point))
+        }
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = T> {
+        (0..self.x_len)
+            .flat_map(move |x_idx| (0..self.y_len).map(move |y_idx| self.grid[x_idx][y_idx]))
+            .into_iter()
+    }
+
+    pub fn elements(&self) -> impl Iterator<Item = GridElement<T>> {
+        (0..self.x_len)
+            .flat_map(move |x_idx| {
+                (0..self.y_len).map(move |y_idx| GridElement {
+                    point: Point {
+                        x: x_idx as i64,
+                        y: y_idx as i64,
+                    },
+                    value: self.grid[x_idx][y_idx],
+                })
+            })
+            .into_iter()
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum Error {
+    IndicesOutOfBounds(Point),
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::IndicesOutOfBounds(point) => write!(f, "Indices {point:?} out of bounds"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
