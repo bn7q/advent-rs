@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use std::fmt::Display;
-use std::fs;
+use std::fmt::{Debug, Display};
 use std::path::PathBuf;
 use std::str::FromStr;
+use std::{fs, usize};
 
 pub mod grid;
 
@@ -62,4 +62,20 @@ where
     }
 
     return m;
+}
+
+pub fn split_and_parse<T: FromStr + Debug, const N: usize>(
+    input: &str,
+    pattern: char,
+) -> Result<[T; N], T::Err> {
+    let split_result: Result<Vec<T>, _> = input.split(pattern).map(|i| i.parse::<T>()).collect();
+    if split_result.is_err() {
+        eprintln!("Cannot split and parse input '{input}' with delimiter '{pattern}'")
+    }
+
+    split_result.map(|split| {
+        split.try_into().expect(&format!(
+            "`split_and_parse` input does not match expected size ({N})"
+        ))
+    })
 }

@@ -1,6 +1,9 @@
-use std::{cmp::max, num::ParseIntError, ops::RangeInclusive};
+use std::{cmp::max, ops::RangeInclusive};
 
-use crate::puzzle::{Puzzle, PuzzleResult};
+use crate::{
+    puzzle::{Puzzle, PuzzleResult},
+    utils::split_and_parse,
+};
 
 pub struct P;
 
@@ -56,7 +59,7 @@ fn parse_input(
 
     for line in input.lines() {
         if line.contains('-') {
-            let (from, to) = parse_range(line)?;
+            let [from, to] = split_and_parse(line, '-')?;
             ranges.push(from..=to);
         } else if line.len() > 0 {
             ingredients.push(line.parse::<u64>()?);
@@ -64,12 +67,4 @@ fn parse_input(
     }
 
     Ok((ranges, ingredients))
-}
-
-fn parse_range(input: &str) -> Result<(u64, u64), ParseIntError> {
-    let parts: Result<Vec<u64>, ParseIntError> = input.split('-').map(|i| i.parse()).collect();
-    let [from, to] = parts?[0..2] else {
-        panic!("Invalid input: {input}")
-    };
-    Ok((from, to))
 }
