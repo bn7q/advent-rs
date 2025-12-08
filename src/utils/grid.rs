@@ -191,3 +191,27 @@ impl std::fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub struct Vector3D {
+    pub x: Csize,
+    pub y: Csize,
+    pub z: Csize,
+}
+pub type Point3D = Vector3D;
+
+impl Vector3D {
+    pub fn new(x: Csize, y: Csize, z: Csize) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn from_slice(coordinates: [Csize; 3]) -> Self {
+        let [x, y, z] = coordinates;
+        Self { x, y, z }
+    }
+
+    pub fn distance_to(&self, other: &Self) -> f64 {
+        (((self.x - other.x).pow(2) + (self.y - other.y).pow(2) + (self.z - other.z).pow(2)) as f64)
+            .sqrt()
+    }
+}
