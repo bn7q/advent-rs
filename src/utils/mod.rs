@@ -75,7 +75,7 @@ pub fn split_and_parse<T: FromStr + Debug, const N: usize>(
 
     split_result.map(|split| {
         split.try_into().expect(&format!(
-            "`split_and_parse` input does not match expected size ({N})"
+            "`split_and_parse` input does not match expected size ({N}): {input}"
         ))
     })
 }

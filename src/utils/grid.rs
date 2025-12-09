@@ -1,11 +1,11 @@
-use std::ops;
+use std::{ops, u8};
 
-type Csize = i64;
+pub type Csize = i64;
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub struct Vector {
-    x: Csize,
-    y: Csize,
+    pub x: Csize,
+    pub y: Csize,
 }
 pub type Point = Vector;
 
@@ -29,6 +29,11 @@ pub const NEIGBOURS_ALL: [Vector; 8] = [
 impl Vector {
     pub fn new(x: Csize, y: Csize) -> Self {
         Self { x: x, y: y }
+    }
+
+    pub fn from_slice(coordinates: [Csize; 2]) -> Self {
+        let [x, y] = coordinates;
+        Self { x, y }
     }
 
     // clockwise
@@ -157,6 +162,36 @@ impl<T: Copy> Grid<T> {
                 })
             })
             .into_iter()
+    }
+
+    pub fn draw_line(&mut self, from: Point, to: Point, element: T) -> Result<(), Error> {
+        let mut brush = from.clone();
+        let dir = Vector {
+            x: (to.x - from.x).signum(),
+            y: (to.y - from.y).signum(),
+        };
+        loop {
+            println!("{brush:?}");
+            self.set(&brush, element)?;
+            if brush == to {
+                return Ok(());
+            }
+            if brush.x != to.x {
+                brush.x += dir.x;
+            }
+            if brush.y != to.y {
+                brush.y += dir.y;
+            }
+        }
+    }
+}
+
+impl std::fmt::Display for Grid<u8> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for row in &self.grid {
+            writeln!(f, "{}", str::from_utf8(row).unwrap())?
+        }
+        write!(f, "size: [{}, {}]", self.x_len, self.y_len)
     }
 }
 
