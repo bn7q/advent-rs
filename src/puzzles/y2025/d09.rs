@@ -20,7 +20,7 @@ impl Puzzle for P {
 
         for i in 0..points.len() - 1 {
             for j in i + 1..points.len() {
-                let square = ((points[i].x - points[j].x).abs() + 1) * ((points[i].y - points[j].y).abs() + 1);
+                let square = rect_area(points[i], points[j]);
                 largest_area = max(square, largest_area);
             }
         }
@@ -35,15 +35,7 @@ impl Puzzle for P {
             .collect::<Result<Vec<Point>, _>>()?;
 
         let polygon = Polygon::new(
-            LineString(
-                points
-                    .iter()
-                    .map(|v| Coord {
-                        x: v.x as f64,
-                        y: v.y as f64,
-                    })
-                    .collect(),
-            ),
+            LineString(points.iter().map(|&v| v.into()).collect()),
             vec![],
         );
 
@@ -51,18 +43,9 @@ impl Puzzle for P {
 
         for i in 0..points.len() - 1 {
             for j in i + 1..points.len() {
-                let area = ((points[i].x - points[j].x).abs() + 1) * ((points[i].y - points[j].y).abs() + 1);
+                let area = rect_area(points[i], points[j]);
                 if area > largest_area {
-                    let rect = Rect::new(
-                        Coord {
-                            x: points[i].x as f64,
-                            y: points[i].y as f64,
-                        },
-                        Coord {
-                            x: points[j].x as f64,
-                            y: points[j].y as f64,
-                        },
-                    );
+                    let rect = Rect::new(points[i], points[j]);
                     if polygon.contains(&rect) {
                         largest_area = area;
                     }
@@ -71,5 +54,18 @@ impl Puzzle for P {
         }
 
         return Ok(largest_area.to_string());
+    }
+}
+
+fn rect_area(p1: Point, p2: Point) -> i64 {
+    ((p1.x - p2.x).abs() + 1) * ((p1.y - p2.y).abs() + 1)
+}
+
+impl Into<Coord> for Point {
+    fn into(self) -> Coord {
+        Coord {
+            x: self.x as f64,
+            y: self.y as f64,
+        }
     }
 }
