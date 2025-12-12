@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 geo = "0.32"
+itertools = "0.14.0"
 
 [build-dependencies]
 regex = "1.12.2"

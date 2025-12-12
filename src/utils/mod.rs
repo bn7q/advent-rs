@@ -79,3 +79,10 @@ pub fn split_and_parse<T: FromStr + Debug, const N: usize>(
         ))
     })
 }
+
+pub fn strip_brackets(string: &str) -> &str {
+    let mut chars = string.chars();
+    chars.next();
+    chars.next_back();
+    chars.as_str()
+}

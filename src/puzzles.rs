@@ -16,6 +16,7 @@ pub mod y2025 {
     pub mod d09;
     pub mod d10;
     pub mod d11;
+    pub mod d12;
 }
 
 pub fn get_puzzle(y: u16, d: u16) -> Option<Box<dyn Puzzle>> {
@@ -33,6 +34,7 @@ pub fn get_puzzle(y: u16, d: u16) -> Option<Box<dyn Puzzle>> {
         (2025, 9) => Some(Box::new(y2025::d09::P)),
         (2025, 10) => Some(Box::new(y2025::d10::P)),
         (2025, 11) => Some(Box::new(y2025::d11::P)),
+        (2025, 12) => Some(Box::new(y2025::d12::P)),
         _ => None,
     }
 }
